@@ -9,7 +9,7 @@ unicorn_companies <- read.csv("data/Unicorn_Clean.csv")
 industry_values <- unique(unicorn_companies$Industry)
 print(industry_values)
 industry_choices <- unlist(industry_values)
-print(industry_choices)
+print(industry_choices) #dd
 
 ui <- navbarPage(
   "My Shiny App",
