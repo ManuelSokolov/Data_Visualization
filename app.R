@@ -3,13 +3,21 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(tidyr)
+#install.packages("libzip")
+#install.packages("png")
+#install.packages("RgoogleMaps")
+#install.packages("ggmap")
+install.packages("rnaturalearth")
+#library("ggmap")
+#library(rnaturalearth)
 
+#world_map <- ne_countries(scale = "medium", returnclass = "sf")
 
 unicorn_companies <- read.csv("data/Unicorn_Clean.csv")
 industry_values <- unique(unicorn_companies$Industry)
-print(industry_values)
+print(colnames(unicorn_companies))
 industry_choices <- unlist(industry_values)
-print(industry_choices) #dd
+print(industry_choices) 
 
 ui <- navbarPage(
   "My Shiny App",
@@ -52,11 +60,15 @@ server <- function(input, output) {
       select(Industry, City)
     filtered_data <- unicorn_companies %>% filter(Industry == industry_select())
     investors_data <- filtered_data %>% 
-      gather("Investor", "name", Investor.1:Investor.4) %>%
-      group_by(name) %>%
+      gather("Investor", "name", Investor.1:Investor.4)# %>%
+    investors_data <- investors_data %>% filter(name != "") %>%
+      group_by(name) %>% 
       summarise(n=n()) %>%
-      top_n(10)
-    print(investors_data)
+      arrange(desc(n))
+    write.csv(investors_data,"data/cenas.csv",row.names = FALSE)
+   # print(type(investors_data))
+  
+   # print(investors_data)
     ggplot(data = investors_data, aes(x=name, y=n, fill = name)) + 
       geom_bar(stat = "identity") +
       ggtitle("Top Investors for selected Industry") +
@@ -64,16 +76,15 @@ server <- function(input, output) {
       ylab("Correlation")
     
   })
-  
   output$industry_investors_plot2 <- renderPlot({
-    industry_investors_data <- unicorn_companies %>% 
-      select(Industry, City)
-    industry_investors_data <- reshape2::melt(industry_investors_data, id.vars = "City")
-    ggplot(data = industry_investors_data, aes(x=City, y=value, filal = variable)) + 
-      geom_tile() + 
-      scale_fill_manual(values = c("#999999", "#E69F00")) +
-      theme_minimal() +
-      ggtitle("Industry and City correlation plot")
+    industry_investors_data <- unicorn_companies %>% select(Country, Valuation...B)
+    industry_investors_data <- group_by(industry_investors_data,Country) %>% summarise(Valuation = mean(Valuation...B))
+    industry_investors_data$Valuation <- log10(industry_investors_data$Valuation)
+    ggplot(data = industry_investors_data, aes(map_id = Country,fill=Valuation)) + 
+      geom_sf(data = world_map) +
+      scale_fill_gradientn(colours = rev(terrain.colors(5))) +
+      theme_void() +
+      ggtitle("Valuation by country")
   })
   
 }
