@@ -3,31 +3,24 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(tidyr)
-library(purrr)
 
 
 unicorn_companies <- read.csv("data/Unicorn_Clean.csv")
 industry_values <- unique(unicorn_companies$Industry)
-industry_choices <- map(industry_values, ~list(name = .x, value = .x))
-
-#print(industry_values)
-#industry_choices <- unlist(industry_values)
-#print(industry_choices)
+print(industry_values)
+industry_choices <- unlist(industry_values)
+print(industry_choices)
 
 ui <- navbarPage(
   "My Shiny App",
   tabPanel("Tab 1 - Industry and Investors", value = "tab1",
            titlePanel("Are companies in certain industries more likely to attract certain investors?"),
            fluidRow(
-             column(3, style = "background-color: #F4F6F6; height: 580px; width: 230px",
-                    selectInput("var",
-                      inputId = "industry",
-                      label = "Select a Industry Type:", 
-                      choices = industry_choices,
-                      selected = NULL,
-                      multiple = FALSE
-                      )
-             )),
+             selectInput(inputId = "industry", 
+                         label = h4(strong("Select a Industry Type:")), 
+                         choices = industry_choices,
+                         selected = NULL)
+           ),
            plotOutput("industry_investors_plot", click = "plot_click")),
   tabPanel("Tab 2", value = "tab2",titlePanel("Is there any geographical pattern regarding investment?"),
            plotOutput("industry_investors_plot2", click = "plot_click"),
@@ -42,7 +35,7 @@ server <- function(input, output) {
 #  print(names(unicorn_companies))
   #print(input$industry)
   industry_select <- reactive({input$industry})
-  print()
+  print(industry_select)
   #output$industry_investors_plot <- renderPlot({
   #  industry_investors_data <- unicorn_companies %>% 
   #    select(Industry, Company)
@@ -57,7 +50,7 @@ server <- function(input, output) {
   output$industry_investors_plot <- renderPlot({
     industry_investors_data <- unicorn_companies %>% 
       select(Industry, City)
-    filtered_data <- unicorn_companies %>% filter(Industry == input$var)
+    filtered_data <- unicorn_companies %>% filter(Industry == industry_select())
     investors_data <- filtered_data %>% 
       gather("Investor", "name", Investor.1:Investor.4) %>%
       group_by(name) %>%
@@ -66,7 +59,7 @@ server <- function(input, output) {
     print(investors_data)
     ggplot(data = investors_data, aes(x=name, y=n, fill = name)) + 
       geom_bar(stat = "identity") +
-      ggtitle("Top Investors for") +
+      ggtitle("Top Investors for selected Industry") +
       xlab("Investor") +
       ylab("Correlation")
     
