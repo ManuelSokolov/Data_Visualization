@@ -3,13 +3,16 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(tidyr)
-#install.packages("libzip")
-#install.packages("png")
-#install.packages("RgoogleMaps")
-#install.packages("ggmap")
+install.packages("libzip")
+install.packages("png")
+install.packages("RgoogleMaps")
+install.packages("ggmap")
 install.packages("rnaturalearth")
-#library("ggmap")
-#library(rnaturalearth)
+install.packages('maps')
+library("ggmap")
+library('rnaturalearth')
+library(maps)
+library(mapproj)
 
 #world_map <- ne_countries(scale = "medium", returnclass = "sf")
 
@@ -77,15 +80,34 @@ server <- function(input, output) {
     
   })
   output$industry_investors_plot2 <- renderPlot({
-    industry_investors_data <- unicorn_companies %>% select(Country, Valuation...B)
-    industry_investors_data <- group_by(industry_investors_data,Country) %>% summarise(Valuation = mean(Valuation...B))
-    industry_investors_data$Valuation <- log10(industry_investors_data$Valuation)
-    ggplot(data = industry_investors_data, aes(map_id = Country,fill=Valuation)) + 
-      geom_sf(data = world_map) +
-      scale_fill_gradientn(colours = rev(terrain.colors(5))) +
-      theme_void() +
-      ggtitle("Valuation by country")
+    # Get the average valuation for each country
+    industry_investors_data <- unicorn_companies %>% 
+      group_by(Country) %>% 
+      summarize(Valuation = mean(Valuation...B))
+    #merging the data 
+    world_map_valuation <- merge(map('world',plot=F,fill=T), industry_investors_data, by.x = "region", by.y = "Country")
+    # Plot the map
+    ggplot()+geom_polygon(data=world_map_valuation,aes(x=long,y=lat,group=group,fill=Valuation))+
+      scale_fill_gradient(low = "white", high = "darkblue")+
+      ggtitle("Map of the world by country valuation") +
+      xlab("Longitude") +
+      ylab("Latitude")+
+      theme(axis.line=element_blank(),
+            axis.text.x=element_blank(),
+            axis.text.y=element_blank(),
+            axis.ticks=element_blank(),
+            axis.title.x=element_blank(),
+            axis.title.y=element_blank(),
+            panel.background=element_blank(),
+            panel.border=element_blank(),
+            panel.grid.major=element_blank(),
+            panel.grid.minor=element_blank(),
+            legend.title=element_blank(),
+            legend.text=element_text(size=10),
+            legend.position="right")
   })
+  
+  
   
 }
 

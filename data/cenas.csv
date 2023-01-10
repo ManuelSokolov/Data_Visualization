@@ -1,109 +1,161 @@
 "name","n"
-"Goldman Sachs",4
-"General Atlantic",3
-"Tencent Holdings",3
-"Accel",2
-"Advent International",2
-"Andreessen Horowitz",2
-"Bessemer Venture Partners",2
-"Bond",2
-"Caffeinated Capital",2
+"Sequoia Capital China",9
+"Andreessen Horowitz",4
+"Insight Partners",4
+"Tencent Holdings",4
+"Goldman Sachs",3
+"IDG Capital",3
+"Khosla Ventures",3
+"New Enterprise Associates",3
+"Venrock",3
+"Battery Ventures",2
+"ClalTech",2
+"Eclipse Ventures",2
+"FirstMark Capital",2
+"General Atlantic",2
+"Georgian Partners",2
+"Global Founders Capital",2
 "Google Ventures",2
-"KKR",2
-"Sequoia Capital China",2
-"Upfront Ventures",2
-"3i Group",1
-"500 Startups",1
-"A&NN",1
-"Alexandria Venture Investments",1
-"Alibaba Pictures Group",1
-"Astanor Ventures",1
-"BA Capital",1
-"Barter Ventures",1
-"Benchmark",1
-"Blackrock",1
-"Breakthrough Energy Ventures",1
-"Bregal Sagemount",1
-"C5 Capital",1
-"Capital Today",1
-"Capricorn Investment Group",1
-"Carsales",1
-"China Prosperity Capital",1
-"CJ ENM",1
-"Coatue Management",1
-"Cool Japan Fund",1
-"Data Collective",1
-"Draper Fisher Jurvetson",1
-"EXOR Seeds",1
-"Falcon Edge Capital",1
-"Fashion Tech Lab",1
-"Fidelity Investment",1
+"Greycroft",2
+"IA Ventures",2
+"Ignition Partners",2
+"Intel Capital",2
+"Norwest Venture Partners",2
+"Qiming Venture Partners",2
+"Russia-China Investment Fund",2
+"Sinovation Ventures",2
+"Tiger Global Management",2
+"Y Combinator",2
+"ZhenFund",2
+"5Y Capital",1
+"Accel",1
+"Accomplice",1
+"Activant Capital Group",1
+"Aglae Ventures",1
+"Alaska Permanent Fund",1
+"Alibaba Group",1
+"Alkeon Capital Management",1
+"Alven Capital",1
+"Amadeus Capital Partners",1
+"AME Cloud Ventures",1
+"Ant Financial Services Group",1
+"August Capital",1
+"Aviv Venture Capital",1
+"Baidu Ventures",1
+"Baillie Gifford & Co.",1
+"Bain & Company",1
+"Bank of China",1
+"Banyan Capital",1
+"Bessemer Venture Partners",1
+"Big Bets",1
+"BlackRock",1
+"BOC International",1
+"Boyu Capital",1
+"Caterpillar",1
+"Cathay Innovation",1
+"Chengwei Capital",1
+"China Construction Bank",1
+"China Internet Investment Fund",1
+"CICC ALPHA",1
+"Citi Ventures",1
+"Crane Venture Partners",1
+"CRV",1
+"D1 Capital Partners",1
+"DC Thomson Ventures",1
+"DCM Ventures",1
+"Dell Technologies Capital",1
+"DESUN Capital",1
+"DSC Investments",1
+"Eight Roads Ventures",1
+"Emergence Capital Partners",1
+"FANUC",1
 "Fidelity Investments",1
-"Flagship Pioneering",1
+"Ford Autonomous Vehicles",1
+"Forerunner Ventures",1
+"Foundation Capital",1
 "Founders Fund",1
+"Foxconn Technology Company",1
+"FutureX Capital",1
+"GAM Holding",1
 "General Catalyst",1
-"H Capital",1
-"Hemisphere Ventures",1
-"Honeywell",1
-"Huagai Capital",1
-"IDG Capital",1
-"IDInvest Partners",1
-"Inclusive Capital Partners",1
-"Investment Corporation of Dubai",1
-"Invus Group",1
-"JAFCO",1
-"K2 Global",1
-"KCK Group",1
-"Kleiner Perkins Caulfield & Byers",1
-"Leonardo DiCaprio",1
-"Lockheed Martin Ventures",1
-"Matrix Partners",1
-"Max Ventures",1
-"Mayfair Equity Partners",1
-"Mitsubishi Corporation",1
-"New Enterprise Associates",1
-"Norwest Venture Partners",1
-"O'Reilly AlphaTech Ventures",1
-"OLX Group",1
-"Playground Global",1
-"Promecap",1
-"Raven One Ventures",1
-"RedBird Capital Partners",1
-"Revolution Growth",1
-"Rhone Capital",1
-"RiverPark Ventures",1
-"Rothenberg Ventures",1
-"Rubicon Technology Partners",1
-"Rusnano",1
+"Global Catalyst Partnera",1
+"Glory Ventures",1
+"Greylock Partners",1
+"Griffin Gaming Partners",1
+"Group GSR Ventures",1
+"GSR Ventures",1
+"Guangdong Technology Financial Group",1
+"Hillhouse Capital Management",1
+"HOF Capital",1
+"Homebrew",1
+"Hongxiu VC",1
+"Hopu Investment Management",1
+"Index Ventures",1
+"Infore Capital",1
+"Initialized Capital",1
+"Innovation Endeavors",1
+"Insights Partners",1
+"Institutional Venture Partners",1
+"Kaszek Ventures",1
+"KKR",1
+"Kleiner Perkins Caufield & Byers",1
+"KTB Ventures",1
+"Lenovo Capital and Incubator",1
+"Lerer Hippeau",1
+"Lightspeed China Partners",1
+"Lightspeed Venture Partners",1
+"Linear Venture",1
+"Madera Technology Partners",1
+"Madrona Venture Group",1
+"Maniv Mobility",1
+"March Capital Partners",1
+"Menlo Ventures",1
+"Meridian Capital",1
+"Mizuho Financial Group",1
+"Moore Capital Management",1
+"Morningside Venture Capital",1
+"Munich Re Ventures",1
+"Next World Capital",1
+"Nexus Venture Partners",1
+"NJF Capital",1
+"Northern Light Venture Capital",1
+"Oriza Holdings",1
+"Oryzn Capital",1
+"Pitango Venture Capital",1
+"Point72 Ventures",1
+"Qualcomm Ventures",1
+"Revolution",1
+"Revolution Ventures",1
+"RRE Ventures",1
+"Sapphire Ventures",1
 "Sequoia Capital",1
-"Sequoia Capital India",1
-"Silver Lake Partners",1
-"SK Ventures",1
-"Smash Ventures",1
+"Shea Ventures",1
+"SIG Asia Investments",1
+"Sina Weibo",1
+"Smilegate Investment",1
+"Social Capital",1
+"Softbank Group",1
 "SoftBank Group",1
-"Sozo Ventures",1
-"Sutter Hill Ventures",1
-"SWaN & Legend Ventures",1
-"T. Rowe Price",1
-"Tao Capital Partners",1
-"Temasek",1
-"Temasek Holdings",1
+"SOFTBANK Latin America Ventures",1
+"SOSV",1
+"Spark Capital",1
+"Star VC",1
+"TDK Ventures",1
 "Tencent",1
-"Tencent Investment",1
-"The Carlyle Group",1
-"The Venture Collective",1
-"Threshold Ventures",1
-"Tiger Global Management",1
-"TowerBrook Capital Partners",1
-"Trane Technologies",1
-"Tribe Capital",1
-"Undisclosed",1
-"Upper90",1
-"Valor Equity Partners",1
-"Vast Ventures",1
-"Vattenfall",1
+"Tiger Global",1
+"Tomales Bay Capital",1
+"TopoScend Capital",1
+"Toyota Motor Corporation",1
+"Transamerica Ventures",1
+"Union Square Ventures",1
+"Vcanbio",1
+"Version One Ventures",1
+"Vertex Ventures",1
+"Viola Ventures",1
+"Vision Plus Capital",1
 "Volkswagen Group",1
-"Warburg Pincus",1
-"WRVI Capital",1
-"XBTO Ventures",1
-"Y Combinator",1
+"Walden Venture Capital",1
+"Wing Venture Capital",1
+"Woodford Investment Management",1
+"Xiaomi",1
+"Yunfeng Capital",1
