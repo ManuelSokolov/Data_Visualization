@@ -3,13 +3,16 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(tidyr)
+library(purrr)
 
 
 unicorn_companies <- read.csv("data/Unicorn_Clean.csv")
 industry_values <- unique(unicorn_companies$Industry)
-print(industry_values)
-industry_choices <- unlist(industry_values)
-print(industry_choices)
+industry_choices <- map(industry_values, ~list(name = .x, value = .x))
+
+#print(industry_values)
+#industry_choices <- unlist(industry_values)
+#print(industry_choices)
 
 ui <- navbarPage(
   "My Shiny App",
@@ -17,12 +20,13 @@ ui <- navbarPage(
            titlePanel("Are companies in certain industries more likely to attract certain investors?"),
            fluidRow(
              column(3, style = "background-color: #F4F6F6; height: 580px; width: 230px",
-                    radioButtons(
+                    selectInput("var",
                       inputId = "industry",
-                      h4(strong("Select a Industry Type:")), 
+                      label = "Select a Industry Type:", 
                       choices = industry_choices,
                       selected = NULL,
-                      inline = FALSE),
+                      multiple = FALSE
+                      )
              )),
            plotOutput("industry_investors_plot", click = "plot_click")),
   tabPanel("Tab 2", value = "tab2",titlePanel("Is there any geographical pattern regarding investment?"),
@@ -38,7 +42,7 @@ server <- function(input, output) {
 #  print(names(unicorn_companies))
   #print(input$industry)
   industry_select <- reactive({input$industry})
-  print(industry_select)
+  print()
   #output$industry_investors_plot <- renderPlot({
   #  industry_investors_data <- unicorn_companies %>% 
   #    select(Industry, Company)
@@ -53,7 +57,7 @@ server <- function(input, output) {
   output$industry_investors_plot <- renderPlot({
     industry_investors_data <- unicorn_companies %>% 
       select(Industry, City)
-    filtered_data <- unicorn_companies %>% filter(Industry == industry_select())
+    filtered_data <- unicorn_companies %>% filter(Industry == input$var)
     investors_data <- filtered_data %>% 
       gather("Investor", "name", Investor.1:Investor.4) %>%
       group_by(name) %>%
