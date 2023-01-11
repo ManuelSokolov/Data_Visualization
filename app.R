@@ -9,10 +9,12 @@ library(tidyr)
 #install.packages("ggmap")
 #install.packages("rnaturalearth")
 #install.packages('maps')
+install.packages('factoextra')
 library(ggmap)
 library('rnaturalearth')
 library(maps)
 library(mapproj)
+library(factoextra)
 
 #world_map <- ne_countries(scale = "medium", returnclass = "sf")
 
@@ -21,6 +23,8 @@ industry_values <- unique(unicorn_companies$Industry)
 print(colnames(unicorn_companies))
 industry_choices <- unlist(industry_values)
 print(industry_choices) 
+
+#industry_investor_frequencies <- read.csv("data/industry_investor_frequencies.csv")
 
 ui <- navbarPage(
   "My Shiny App",
@@ -33,10 +37,13 @@ ui <- navbarPage(
                          selected = NULL)
            ),
            plotOutput("industry_investors_plot", click = "plot_click")),
-  tabPanel("Tab 2", value = "tab2",titlePanel("Is there any geographical pattern regarding investment?"),
-           plotOutput("industry_investors_plot2", click = "plot_click"),
+  tabPanel("Tab 2", value = "tab2",titlePanel("Can investors be grouped?"),
+           plotOutput("clustering_plot", click = "plot_click"),
            ),
-  tabPanel("Tab 3", value = "tab3",
+  tabPanel("Tab 3", value = "tab3",titlePanel("Is there any geographical pattern regarding investment?"),
+           plotOutput("industry_investors_plot2", click = "plot_click"),
+  ),
+  tabPanel("Tab 4", value = "tab4",
            titlePanel("What makes a company more valuated?"))
 )
 
@@ -83,10 +90,9 @@ server <- function(input, output) {
     industry_investors_data <- unicorn_companies %>% 
       group_by(Country) %>% 
       summarize(Valuation = mean(Valuation...B.))
-    #maping names from "Country" column to match with map_data
-    industry_investors_data$Country <- mapvalues(industry_investors_data$Country, from = c("United States"), to = c("United States of America"))
-    # Get the map data as a data frame
     world_map_data <- map_data("world")
+    print(sort(unique(ggplot2::map_data("world")$region)))
+    
     
     # Merge the map data with your data and fill in missing values
     world_map_valuation <- world_map_data %>% 
@@ -101,6 +107,28 @@ server <- function(input, output) {
       xlab("Longitude") +
       ylab("Latitude") +
       theme_void()
+  })
+  
+  
+  
+  output$clustering_plot <- renderPlot({
+    # Read in the data
+    industry_investor_frequencies <- read.csv("data/industry_investor_frequencies.csv", row.names = 1)
+    
+    # Compute the Euclidean distance matrix between investors
+    distance_matrix <- dist(industry_investor_frequencies, method = "euclidean")
+    
+    # Perform hierarchical clustering on the distance matrix
+    cluster_result <- hclust(distance_matrix)
+    
+    # Plot the dendrogram of the clustering result
+    par(mar = c(0, 4, 2, 0))
+    plot(cluster_result, hang = -1)
+    
+    # Create a heatmap of the distance matrix
+    par(mar = c(4, 4, 2, 0))
+    heatmap(as.matrix(distance_matrix), Rowv = as.dendrogram(cluster_result), 
+            col = heat.colors(256), scale = "column", margins = c(5,10))
   })
   
   
