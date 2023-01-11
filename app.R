@@ -3,13 +3,13 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(tidyr)
-install.packages("libzip")
-install.packages("png")
-install.packages("RgoogleMaps")
-install.packages("ggmap")
-install.packages("rnaturalearth")
-install.packages('maps')
-library("ggmap")
+#install.packages("libzip")
+#install.packages("png")
+#install.packages("RgoogleMaps")
+#install.packages("ggmap")
+#install.packages("rnaturalearth")
+#install.packages('maps')
+library(ggmap)
 library('rnaturalearth')
 library(maps)
 library(mapproj)
@@ -59,52 +59,48 @@ server <- function(input, output) {
   #})
   
   output$industry_investors_plot <- renderPlot({
-    industry_investors_data <- unicorn_companies %>% 
+    industry_investors_data <- unicorn_companies %>%
       select(Industry, City)
     filtered_data <- unicorn_companies %>% filter(Industry == industry_select())
-    investors_data <- filtered_data %>% 
-      gather("Investor", "name", Investor.1:Investor.4)# %>%
-    investors_data <- investors_data %>% filter(name != "") %>%
-      group_by(name) %>% 
+    investors_data <- filtered_data %>%
+      gather("Investor", "name", Investor.1:Investor.4) %>%
+      filter(name != "") %>%
+      group_by(name) %>%
       summarise(n=n()) %>%
-      arrange(desc(n))
-    write.csv(investors_data,"data/cenas.csv",row.names = FALSE)
-   # print(type(investors_data))
-  
-   # print(investors_data)
-    ggplot(data = investors_data, aes(x=name, y=n, fill = name)) + 
+      arrange(desc(n)) %>%
+      slice_head(n = 10) 
+    ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name)) +
       geom_bar(stat = "identity") +
       ggtitle("Top Investors for selected Industry") +
       xlab("Investor") +
-      ylab("Correlation")
-    
+      ylab("Frequency")
   })
+  
+  
+  
   output$industry_investors_plot2 <- renderPlot({
     # Get the average valuation for each country
     industry_investors_data <- unicorn_companies %>% 
       group_by(Country) %>% 
-      summarize(Valuation = mean(Valuation...B))
-    #merging the data 
-    world_map_valuation <- merge(map('world',plot=F,fill=T), industry_investors_data, by.x = "region", by.y = "Country")
-    # Plot the map
-    ggplot()+geom_polygon(data=world_map_valuation,aes(x=long,y=lat,group=group,fill=Valuation))+
-      scale_fill_gradient(low = "white", high = "darkblue")+
+      summarize(Valuation = mean(Valuation...B.))
+    #maping names from "Country" column to match with map_data
+    industry_investors_data$Country <- mapvalues(industry_investors_data$Country, from = c("United States"), to = c("United States of America"))
+    # Get the map data as a data frame
+    world_map_data <- map_data("world")
+    
+    # Merge the map data with your data and fill in missing values
+    world_map_valuation <- world_map_data %>% 
+      left_join(industry_investors_data, by = c("region" = "Country")) %>%
+      complete(region, Valuation)
+    
+     # Plot the map
+    ggplot(data=world_map_valuation) + 
+      geom_polygon(aes(x=long, y=lat, group=group, fill=Valuation)) +
+      scale_fill_gradient(low = "white", high = "darkblue") +
       ggtitle("Map of the world by country valuation") +
       xlab("Longitude") +
-      ylab("Latitude")+
-      theme(axis.line=element_blank(),
-            axis.text.x=element_blank(),
-            axis.text.y=element_blank(),
-            axis.ticks=element_blank(),
-            axis.title.x=element_blank(),
-            axis.title.y=element_blank(),
-            panel.background=element_blank(),
-            panel.border=element_blank(),
-            panel.grid.major=element_blank(),
-            panel.grid.minor=element_blank(),
-            legend.title=element_blank(),
-            legend.text=element_text(size=10),
-            legend.position="right")
+      ylab("Latitude") +
+      theme_void()
   })
   
   
