@@ -34,5 +34,7 @@ df55 = pd.read_csv('Unicorn_Clean.csv', index_col=False)
 
 df55['Country'] = df55['Country'].replace('United States', 'USA')
 df55['Country'] = df55['Country'].replace('United Kingdom', 'UK')
-
+df55['Country'] = df55['Country'].replace('Hong Kong', 'China')
+df55['Country'] = df55['Country'].replace('Santa Clara', 'USA')
+df55= df55.sort_values('Country')
 df55.to_csv('teste.csv')
