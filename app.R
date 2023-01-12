@@ -62,21 +62,26 @@ ui <- navbarPage(
                          selected = NULL),
              sliderInput(inputId = "range",
                          label = "Number of Investors",
-                         min = 0,
+                         min = 1,
                          max = 30,
-                         value = c(0, 30))
+                         value = 10
            ),
-           plotOutput("industry_investors_plot", click = "plot_click")),
+           plotOutput("industry_investors_plot", click = "plot_click"))),
   
   
   tabPanel("Tab 2 - Valuation and Total Raised", value = "tab2",
            titlePanel("Is Valuation correlated with total raised?"),
            # not interactive
            plotOutput("clustering_plot", click = "plot_click"),
+           sliderInput(inputId = "range_clusters",
+                       label = "Number of clusters",
+                       min = 2,
+                       max = 10,
+                       value = 5
            #interactive 
            
            #plotlyOutput("clustering_plot")
-           ),
+           )),
   
   tabPanel("Tab 3 - Map World Valuation", value = "tab3",titlePanel("Is there any geographical pattern regarding investment?"),
            plotOutput("map_plot", click = "plot_click"),
@@ -165,7 +170,7 @@ server <- function(input, output) {
     valuation_total_raised <- valuation_total_raised %>% drop_na()
     
     # Perform k-means clustering
-    kmeans_fancy <- kmeans(scale(valuation_total_raised), 5, nstart = 100)
+    kmeans_fancy <- kmeans(scale(valuation_total_raised), max(input$range_clusters) , nstart = 100)
     
     # Add cluster column to the original dataframe
     unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
