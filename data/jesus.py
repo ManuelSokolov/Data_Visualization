@@ -2,12 +2,19 @@ import pandas as pd
 
 # Load the CSV file into a DataFrame
 # df = pd.read_csv('Unicorn_Clean.csv', index_col=False)
-df55 = pd.read_csv('Unicorn_Clean.csv', index_col=False)
+df55 = pd.read_csv('Unicorn_Companies.csv', index_col=False)
+print(df55.columns)
+df55.dropna(subset=['Valuation ($B)','Founded Year'])
 # #print (df.head(5))
+print(df55['Valuation ($B)'].isna().sum())
+print(df55['Founded Year'].isna().sum())
 
+print(df55['Valuation ($B)'][0])
+
+#df55.to_csv('Unicorn_Companies_for_cluster.csv')
 # #print(df.columns)
 # df = df.drop(['Company', 'Valuation ($B)', 'Date Joined', 'Country', 'City'], axis=1)
-
+exit(1)
 # lista1 = [x for x in df["Investor 1"].unique().tolist() if str(x) != 'nan']
 # lista2 = [x for x in df["Investor 2"].unique().tolist() if str(x) != 'nan']
 # lista3 = [x for x in df["Investor 3"].unique().tolist() if str(x) != 'nan']
