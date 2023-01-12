@@ -69,13 +69,16 @@ ui <- navbarPage(
            plotOutput("industry_investors_plot", click = "plot_click")),
   
   
-  tabPanel("Tab 2", value = "tab2 - Valuation and Total Raised ",
+  tabPanel("Tab 2 - Valuation and Total Raised", value = "tab2",
            titlePanel("Is Valuation correlated with total raised?"),
+           # not interactive
            plotOutput("clustering_plot", click = "plot_click"),
-           #plotlyOutput("heatmap")
+           #interactive 
+           
+           #plotlyOutput("clustering_plot")
            ),
   
-  tabPanel("Tab 3", value = "tab3",titlePanel("Is there any geographical pattern regarding investment?"),
+  tabPanel("Tab 3 - Map World Valuation", value = "tab3",titlePanel("Is there any geographical pattern regarding investment?"),
            plotOutput("map_plot", click = "plot_click"),
   ),
   
@@ -87,7 +90,7 @@ server <- function(input, output) {
   # Read in the unicorn companies dataset
   industry_select <- reactive({input$industry})
   #print(industry_select)
-  nrInvestors <- reactive (max(as.numeric(input$range)))
+  
   
   output$industry_investors_plot <- renderPlot({
     industry_investors_data <- unicorn_companies_clean %>%
@@ -100,8 +103,7 @@ server <- function(input, output) {
       group_by(name) %>%
       summarise(n=n()) %>%
       arrange(desc(n)) %>%
-      max_nrInvestors <- as.numeric(nrInvestors) %>%
-      slice_head(n = max_nrInvestors)
+      slice_head(n = max(input$range))
     
     ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name)) +
       geom_bar(stat = "identity") +
@@ -124,12 +126,12 @@ server <- function(input, output) {
     # Merge the map data with your data and fill in missing values
     world_map_valuation <- world_map_data %>% 
       left_join(industry_investors_data, by = c("region" = "Country")) %>%
-      complete(region, Valuation)
+      mutate(Valuation = coalesce(Valuation, 0.0))
     
      # Plot the map
     ggplot(data=world_map_valuation) + 
       geom_polygon(aes(x=long, y=lat, group=group, fill=Valuation)) +
-      scale_fill_gradient(low = "white", high = "darkblue") +
+      scale_fill_gradient(low = "lightblue", high = "darkblue") +
       ggtitle("Map of the world by country valuation") +
       xlab("Longitude") +
       ylab("Latitude") +
@@ -161,24 +163,16 @@ server <- function(input, output) {
   output$clustering_plot <- renderPlot({
     valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
     valuation_total_raised <- valuation_total_raised %>% drop_na()
-    col_names <- names(valuation_total_raised)
-    names(valuation_total_raised) <- col_names
-    # Set seed
-    set.seed(1234)
-    #heatmaply(industry_investor_frequencies)
-    # Cluster Analysis - kmeans
-    #kmeans_basic <- kmeans(valuation_total_raised, centers = 5)
-    #kmeans_basic_table <- data.frame(kmeans_basic$size, kmeans_basic$centers)
-    #kmeans_basic_df <- data.frame(Cluster = kmeans_basic$cluster, valuation_total_raised)
-    # head of df
-    #head(kmeans_basic_df)
     
-    # Fancy kmeans
+    # Perform k-means clustering
     kmeans_fancy <- kmeans(scale(valuation_total_raised), 5, nstart = 100)
+    
+    # Add cluster column to the original dataframe
+    unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
+    
     # plot the clusters
     fviz_cluster(kmeans_fancy, data = scale(valuation_total_raised), geom = c("point"),ellipse.type = "euclid")
   })
-  
 }
 
 shinyApp(ui = ui, server = server)

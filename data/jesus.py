@@ -22,6 +22,7 @@ df55['Total Raised'] = df55['Total Raised'].replace("None",np.nan)
 df55 = df55.dropna(subset=['Valuation ($B)','Founded Year','Total Raised'])
 # #print (df.head(5))
 # Remove "$" character
+df55 = df55.drop_duplicates(subset='Company', keep="first")
 df55['Valuation ($B)'] = df55['Valuation ($B)'].str.replace('$','')
 
 # Convert column to float
