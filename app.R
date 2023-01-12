@@ -160,22 +160,18 @@ server <- function(input, output) {
   
   output$clustering_plot <- renderPlot({
     valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
-    
     valuation_total_raised <- valuation_total_raised %>% drop_na()
     col_names <- names(valuation_total_raised)
-    print(col_names)
-    print(str(valuation_total_raised))
     names(valuation_total_raised) <- col_names
-    print(sum(is.na(valuation_total_raised)))
     # Set seed
     set.seed(1234)
     #heatmaply(industry_investor_frequencies)
     # Cluster Analysis - kmeans
-    kmeans_basic <- kmeans(valuation_total_raised, centers = 5)
-    kmeans_basic_table <- data.frame(kmeans_basic$size, kmeans_basic$centers)
-    kmeans_basic_df <- data.frame(Cluster = kmeans_basic$cluster, valuation_total_raised)
+    #kmeans_basic <- kmeans(valuation_total_raised, centers = 5)
+    #kmeans_basic_table <- data.frame(kmeans_basic$size, kmeans_basic$centers)
+    #kmeans_basic_df <- data.frame(Cluster = kmeans_basic$cluster, valuation_total_raised)
     # head of df
-    head(kmeans_basic_df)
+    #head(kmeans_basic_df)
     
     # Fancy kmeans
     kmeans_fancy <- kmeans(scale(valuation_total_raised), 5, nstart = 100)
