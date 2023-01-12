@@ -42,10 +42,7 @@ unicorn_companies <- read.csv("data/Unicorn_Companies.csv")
 unicorn_companies_clean <- read.csv("data/Unicorn_Clean.csv")
 
 #dataset with countries cleanes
-unicorn_countries_cleaned <- read.csv('data/teste.csv')
-
-#dataset cleaned for clustering (in future)
-unicorn_companies_for_clustering <- read.csv("data/Unicorn_Companies_for_cluster.csv")
+unicorn_countries_clustering_cleaned <- read.csv('data/unicorn_ready_for_clustering_and_map.csv')
 
 industry_values <- unique(unicorn_companies_clean$Industry)
 
@@ -118,7 +115,7 @@ server <- function(input, output) {
   
   output$map_plot <- renderPlot({
     # Get the average valuation for each country
-    industry_investors_data <- unicorn_countries_cleaned %>% 
+    industry_investors_data <- unicorn_countries_clustering_cleaned %>% 
       group_by(Country) %>% 
       summarize(Valuation = mean(Valuation...B.))
     world_map_data <- map_data("world")
@@ -162,17 +159,14 @@ server <- function(input, output) {
   #un})
   
   output$clustering_plot <- renderPlot({
-    print(colnames(unicorn_companies_for_clustering))
-    valuation_total_raised <- unicorn_companies_for_clustering[, c("Valuation...B.", "Founded.Year")]
-    valuation_total_raised$Valuation...B. <- as.numeric(sub("$","",valuation_total_raised$Valuation...B.))
-    valuation_total_raised$Founded.Year <- as.numeric(gsub("[^0-9]", "", valuation_total_raised$Founded.Year))
-  
-    valuation_total_raised <- na.omit(valuation_total_raised)
+    valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
+    
+    valuation_total_raised <- valuation_total_raised %>% drop_na()
     col_names <- names(valuation_total_raised)
+    print(col_names)
+    print(str(valuation_total_raised))
     names(valuation_total_raised) <- col_names
     print(sum(is.na(valuation_total_raised)))
-
-  
     # Set seed
     set.seed(1234)
     #heatmaply(industry_investor_frequencies)
