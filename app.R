@@ -62,9 +62,15 @@ ui <- navbarPage(
              selectInput(inputId = "industry", 
                          label = h4(strong("Select a Industry Type:")), 
                          choices = industry_choices,
-                         selected = NULL)
+                         selected = NULL),
+             sliderInput(inputId = "range",
+                         label = "Number of Investors",
+                         min = 0,
+                         max = 30,
+                         value = c(0, 30))
            ),
            plotOutput("industry_investors_plot", click = "plot_click")),
+  
   
   tabPanel("Tab 2", value = "tab2 - Valuation and Total Raised ",
            titlePanel("Is Valuation correlated with total raised?"),
@@ -84,6 +90,7 @@ server <- function(input, output) {
   # Read in the unicorn companies dataset
   industry_select <- reactive({input$industry})
   #print(industry_select)
+  nrInvestors <- reactive (max(as.numeric(input$range)))
   
   output$industry_investors_plot <- renderPlot({
     industry_investors_data <- unicorn_companies_clean %>%
@@ -96,13 +103,15 @@ server <- function(input, output) {
       group_by(name) %>%
       summarise(n=n()) %>%
       arrange(desc(n)) %>%
-      slice_head(n = 10) 
+      max_nrInvestors <- as.numeric(nrInvestors) %>%
+      slice_head(n = max_nrInvestors)
     
     ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name)) +
       geom_bar(stat = "identity") +
       ggtitle("Top Investors for selected Industry") +
       xlab("Investor") +
-      ylab("Frequency")
+      ylab("Frequency") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1))
   })
   
   
