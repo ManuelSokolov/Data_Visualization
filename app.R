@@ -118,7 +118,19 @@ server <- function(input, output) {
       theme(axis.text.x = element_text(angle = 45, hjust = 1))
   })
   
-  
+  output$clustering_plot <- renderPlot({
+    valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
+    valuation_total_raised <- valuation_total_raised %>% drop_na()
+    
+    # Perform k-means clustering
+    kmeans_fancy <- kmeans(scale(valuation_total_raised), max(input$range_clusters) , nstart = 100)
+    
+    # Add cluster column to the original dataframe
+    unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
+    
+    # plot the clusters
+    fviz_cluster(kmeans_fancy, data = scale(valuation_total_raised), geom = c("point"),ellipse.type = "euclid")
+  })
   
   output$map_plot <- renderPlot({
     # Get the average valuation for each country
@@ -165,19 +177,7 @@ server <- function(input, output) {
     
   #un})
   
-  output$clustering_plot <- renderPlot({
-    valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
-    valuation_total_raised <- valuation_total_raised %>% drop_na()
-    
-    # Perform k-means clustering
-    kmeans_fancy <- kmeans(scale(valuation_total_raised), max(input$range_clusters) , nstart = 100)
-    
-    # Add cluster column to the original dataframe
-    unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
-    
-    # plot the clusters
-    fviz_cluster(kmeans_fancy, data = scale(valuation_total_raised), geom = c("point"),ellipse.type = "euclid")
-  })
+ 
 }
 
 shinyApp(ui = ui, server = server)
