@@ -116,25 +116,30 @@ server <- function(input, output) {
     #  xlab("Investor") +
     #  ylab("Frequency") +
     #  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-  #})
+    #})
     #ggplotly(ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name)) +
-     #          geom_bar(stat = "identity", aes(text = name), show.legend = F) +
+    #          geom_bar(stat = "identity", aes(text = name), show.legend = F) +
     #           ggtitle("Top Investors for selected Industry") +
     #           xlab("Investor") +
     #           ylab("Frequency") +
     #           theme(axis.text.x = element_text(angle = 45, hjust = 1))
-             
-    #)
-
     
-    fig <- plot_ly(investors_data, x = investors_data$name, y = investors_data$n, type = 'bar', color = investors_data$name,colors = RColorBrewer::brewer.pal(n = nrow(investors_data),name = 'Set1'))
+    #)
+    
+    
+    investors_data$name <- factor(investors_data$name, levels = investors_data$name[order(investors_data$n)])
+    fig <- plot_ly(investors_data, x = reorder(investors_data$name, -investors_data$n), 
+                   y = investors_data$n, type = 'bar', 
+                   color = investors_data$name,
+                   colors = RColorBrewer::brewer.pal(n = nrow(investors_data),
+                                                     name = 'Set1'))
     fig <- fig %>% layout(title = "Top Investors for selected Industry")
     fig
     
     
     
     
-    })
+  })
   
   output$clustering_plot <- renderPlot({
     valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
