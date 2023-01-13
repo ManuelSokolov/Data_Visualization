@@ -34,6 +34,7 @@ library(FactoMineR)
 library(factoextra)
 
 
+
 #world_map <- ne_countries(scale = "medium", returnclass = "sf")
 # original data set
 unicorn_companies <- read.csv("data/Unicorn_Companies.csv")
@@ -63,10 +64,10 @@ ui <- navbarPage(
              sliderInput(inputId = "range",
                          label = "Number of Investors",
                          min = 1,
-                         max = 30,
+                         max = 20,
                          value = 10
            ),
-           plotOutput("industry_investors_plot", click = "plot_click"))),
+           mainPanel(plotlyOutput("industry_investors_plot")))),
   
   
   tabPanel("Tab 2 - Valuation and Total Raised", value = "tab2",
@@ -97,7 +98,7 @@ server <- function(input, output) {
   #print(industry_select)
   
   
-  output$industry_investors_plot <- renderPlot({
+  output$industry_investors_plot <- renderPlotly({
     industry_investors_data <- unicorn_companies_clean %>%
       select(Industry, City) %>% 
       filter(Industry == industry_select())
@@ -109,14 +110,21 @@ server <- function(input, output) {
       summarise(n=n()) %>%
       arrange(desc(n)) %>%
       slice_head(n = max(input$range))
-    
-    ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name)) +
-      geom_bar(stat = "identity") +
-      ggtitle("Top Investors for selected Industry") +
-      xlab("Investor") +
-      ylab("Frequency") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
-  })
+    #ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name)) +
+    #  geom_bar(stat = "identity") +
+    #  ggtitle("Top Investors for selected Industry") +
+    #  xlab("Investor") +
+    #  ylab("Frequency") +
+    #  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  #})
+    ggplotly(ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name), group = 1, text = paste("<br>Investor: $", name)) +
+               geom_bar(stat = "identity") +
+               ggtitle("Top Investors for selected Industry") +
+               xlab("Investor") +
+               ylab("Frequency") +
+               theme(axis.text.x = element_text(angle = 45, hjust = 1)),
+             #width = 600, height = 400
+    )})
   
   output$clustering_plot <- renderPlot({
     valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
@@ -131,7 +139,7 @@ server <- function(input, output) {
     # plot the clusters
     fviz_cluster(kmeans_fancy, data = scale(valuation_total_raised), geom = c("point"),ellipse.type = "euclid")
   })
-  
+
   output$map_plot <- renderPlot({
     # Get the average valuation for each country
     industry_investors_data <- unicorn_countries_clustering_cleaned %>% 
