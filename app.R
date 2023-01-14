@@ -32,6 +32,9 @@ library(tidyverse)
 library(readxl)
 library(FactoMineR)
 library(factoextra)
+library(leaflet)
+library(tidyverse)
+library(forcats)
 
 
 
@@ -85,18 +88,30 @@ ui <- navbarPage(
            )),
   
   tabPanel("Tab 3 - Map World Valuation", value = "tab3",titlePanel("Is there any geographical pattern regarding investment?"),
-           plotOutput("map_plot", click = "plot_click"),
+           leafletOutput("map_plot")
   ),
   
   tabPanel("Tab 4", value = "tab4",
-           titlePanel("What makes a company more valuated?"))
+           titlePanel("What makes a company more valuated?")
 )
-
+)
 server <- function(input, output) {
   # Read in the unicorn companies dataset
   industry_select <- reactive({input$industry})
   #print(industry_select)
   
+  #spending_range <- reactive({
+   # Out <- filter(spending, Age >= input$sliderAge[1], Age <= input$sliderAge[2])
+ # })
+  
+  #spending_habits <- reactive({
+  #  Out <- filter(spending_range(), Habits %in% input$checkSpending)
+ # })
+  
+  #spending_final <- reactive({
+  #  if (!input$mean || (input$mean %% 2) == 0) return(spending_habits())
+  #  meanscore(spending_habits(), responses)
+  #})
   
   output$industry_investors_plot <- renderPlotly({
     industry_investors_data <- unicorn_companies_clean %>%
@@ -155,8 +170,7 @@ server <- function(input, output) {
     fviz_cluster(kmeans_fancy, data = scale(valuation_total_raised), geom = c("point"),ellipse.type = "euclid")
   })
 
-  output$map_plot <- renderPlot({
-    # Get the average valuation for each country
+  output$map_plot <- renderLeaflet({
     industry_investors_data <- unicorn_countries_clustering_cleaned %>% 
       group_by(Country) %>% 
       summarize(Valuation = mean(Valuation...B.))
@@ -165,23 +179,23 @@ server <- function(input, output) {
     
     # Merge the map data with your data and fill in missing values
     world_map_valuation <- world_map_data %>% 
-      left_join(industry_investors_data, by = c("region" = "Country")) %>%
+      right_join(industry_investors_data, by = c("region" = "Country")) %>%
       mutate(Valuation = coalesce(Valuation, 0.0))
+    #data_subset1 <- subset(world_map_valuation, Valuation > 0.00001)
     
-     # Plot the map
-    ggplot(data=world_map_valuation) + 
-      geom_polygon(aes(x=long, y=lat, group=group, fill=Valuation)) +
-      scale_fill_gradient(low = "lightblue", high = "darkblue") +
-      ggtitle("Map of the world by country valuation") +
-      xlab("Longitude") +
-      ylab("Latitude") +
-      theme_void()
-     
+    data_subset <- world_map_valuation[!duplicated(world_map_valuation[ , c("region")]), ]
+    print(typeof(data_subset))
+    #print(data_subset1)
+    print(data_subset)
+    leaflet(data_subset) %>% addTiles() %>% 
+      addCircleMarkers(lat = data_subset$lat, lng = data_subset$long, 
+                       popup = paste("Country:",data_subset$region, "<br>", "Valuation:",data_subset$Valuation))
+ 
   })
   
   
   
- # output$clustering_plot <- renderPlot({
+ #output$steamGraph <- renderPlot({
     # Read in the data
   #  industry_investor_frequencies <- read.csv("data/industry_investor_frequencies.csv", row.names = 1)
     
@@ -194,12 +208,7 @@ server <- function(input, output) {
     # Plot the dendrogram of the clustering result
     #plot(cluster_result)
     #heatmap(distance_matrix)
-   
-    
-    
-   # heatmap(cluster_result)
-    
-  #un})
+    # heatmap(cluster_result)#un})
   
  
 }
