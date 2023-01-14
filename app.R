@@ -175,8 +175,6 @@ server <- function(input, output) {
       group_by(Country) %>% 
       summarize(Valuation = mean(Valuation...B.))
     world_map_data <- map_data("world")
-    #print(sort(unique(ggplot2::map_data("world")$region)))
-    
     # Merge the map data with your data and fill in missing values
     world_map_valuation <- world_map_data %>% 
       right_join(industry_investors_data, by = c("region" = "Country")) %>%
@@ -184,24 +182,14 @@ server <- function(input, output) {
     #data_subset1 <- subset(world_map_valuation, Valuation > 0.00001)
     data_subset <- world_map_valuation[!duplicated(world_map_valuation[ , c("region")]), ]
     capital_coordinates_dataset <- read.csv('data/country-capitals_clean.csv')[, c("CountryName", "CapitalName","CapitalLatitude","CapitalLongitude")]
-    print(capital_coordinates_dataset)
+  
     capital_coordinates_dataset <- capital_coordinates_dataset %>% 
         right_join(data_subset, by = c("CountryName" = "region"))
-    print(capital_coordinates_dataset)
+
     leaflet(capital_coordinates_dataset) %>% addTiles() %>% 
       addCircleMarkers(lat = as.numeric(capital_coordinates_dataset$CapitalLatitude), lng = as.numeric(capital_coordinates_dataset$CapitalLongitude), 
                       popup = paste("Country:",capital_coordinates_dataset$CountryName, "<br>", "Valuation:",capital_coordinates_dataset$Valuation))
-   # capital_coordinates_dataset$CapitalLatitude <- as.numeric(df$CapitalLatitude)
-    #capital_coordinates_dataset$CapitalLongitude <- as.numeric(df$CapitalLongitude)
-    #print(capital_coordinates_dataset)
-    #capital_coordinates_dataset <- capital_coordinates_dataset %>% 
-    #  left_join(data_subset, by = c("CountryName" = "region"))
-    #print(typeof(data_subset))
-    #print(data_subset1)
-    #print(capital_coordinates_dataset)
-    #leaflet(data_subset) %>% addTiles() %>% 
-    #  addCircleMarkers(lat = data_subset$lat, lng = data_subset$long, 
-     #                  popup = paste("Country:",data_subset$region, "<br>", "Valuation:",data_subset$Valuation))
+
  
   })
 
