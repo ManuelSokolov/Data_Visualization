@@ -182,33 +182,29 @@ server <- function(input, output) {
       right_join(industry_investors_data, by = c("region" = "Country")) %>%
       mutate(Valuation = coalesce(Valuation, 0.0))
     #data_subset1 <- subset(world_map_valuation, Valuation > 0.00001)
-    
     data_subset <- world_map_valuation[!duplicated(world_map_valuation[ , c("region")]), ]
-    print(typeof(data_subset))
+    capital_coordinates_dataset <- read.csv('data/country-capitals_clean.csv')[, c("CountryName", "CapitalName","CapitalLatitude","CapitalLongitude")]
+    print(capital_coordinates_dataset)
+    capital_coordinates_dataset <- capital_coordinates_dataset %>% 
+        right_join(data_subset, by = c("CountryName" = "region"))
+    print(capital_coordinates_dataset)
+    leaflet(capital_coordinates_dataset) %>% addTiles() %>% 
+      addCircleMarkers(lat = as.numeric(capital_coordinates_dataset$CapitalLatitude), lng = as.numeric(capital_coordinates_dataset$CapitalLongitude), 
+                      popup = paste("Country:",capital_coordinates_dataset$CountryName, "<br>", "Valuation:",capital_coordinates_dataset$Valuation))
+   # capital_coordinates_dataset$CapitalLatitude <- as.numeric(df$CapitalLatitude)
+    #capital_coordinates_dataset$CapitalLongitude <- as.numeric(df$CapitalLongitude)
+    #print(capital_coordinates_dataset)
+    #capital_coordinates_dataset <- capital_coordinates_dataset %>% 
+    #  left_join(data_subset, by = c("CountryName" = "region"))
+    #print(typeof(data_subset))
     #print(data_subset1)
-    print(data_subset)
-    leaflet(data_subset) %>% addTiles() %>% 
-      addCircleMarkers(lat = data_subset$lat, lng = data_subset$long, 
-                       popup = paste("Country:",data_subset$region, "<br>", "Valuation:",data_subset$Valuation))
+    #print(capital_coordinates_dataset)
+    #leaflet(data_subset) %>% addTiles() %>% 
+    #  addCircleMarkers(lat = data_subset$lat, lng = data_subset$long, 
+     #                  popup = paste("Country:",data_subset$region, "<br>", "Valuation:",data_subset$Valuation))
  
   })
-  
-  
-  
- #output$steamGraph <- renderPlot({
-    # Read in the data
-  #  industry_investor_frequencies <- read.csv("data/industry_investor_frequencies.csv", row.names = 1)
-    
-    # Compute the Euclidean distance matrix between investors
-   # distance_matrix <- dist(industry_investor_frequencies, method = "euclidean")
-   
-    # Perform hierarchical clustering on the distance matrix
-    #cluster_result <- hclust(distance_matrix)
-    #print(cluster_result)
-    # Plot the dendrogram of the clustering result
-    #plot(cluster_result)
-    #heatmap(distance_matrix)
-    # heatmap(cluster_result)#un})
+
   
  
 }

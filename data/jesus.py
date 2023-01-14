@@ -1,34 +1,5 @@
 import pandas as pd
 import numpy as np
-def convert_raised(val):
-    val = val.replace('$','')
-    if val[-1] == "B":
-        val = val.replace('B','')
-    elif val[-1] == "M":
-        val = val.replace('M','')
-        val = pd.to_numeric(val) * 10 ** -3
-    elif val[-1] == "K":
-        val = val.replace('K','')
-        val = pd.to_numeric(val) * 10 ** -6
-    else:
-        val = pd.to_numeric(val)
-    return val
-# Load the CSV file into a DataFrame
-# df = pd.read_csv('Unicorn_Clean.csv', index_col=False)
-df55 = pd.read_csv('Unicorn_Companies.csv', index_col=False)
-df55['Valuation ($B)'] = df55['Valuation ($B)'].replace("None",np.nan)
-df55['Total Raised'] = df55['Total Raised'].replace("None",np.nan)
-#df55['Total Raised'] = df55['Founded Year'].replace("None",np.nan)
-df55 = df55.dropna(subset=['Valuation ($B)','Founded Year','Total Raised'])
-# #print (df.head(5))
-# Remove "$" character
-df55 = df55.drop_duplicates(subset='Company', keep="first")
-df55['Valuation ($B)'] = df55['Valuation ($B)'].str.replace('$','')
-
-# Convert column to float
-df55['Valuation ($B)'] = df55['Valuation ($B)'].astype(float)
-
-df55['Total Raised'] = df55['Total Raised'].apply(convert_raised)
 
 # #print(df.columns)
 # df = df.drop(['Company', 'Valuation ($B)', 'Date Joined', 'Country', 'City'], axis=1)
@@ -55,11 +26,12 @@ df55['Total Raised'] = df55['Total Raised'].apply(convert_raised)
 #             df1.at[industry, name] += qtd
 
 #df1.to_csv('industry_investor_frequencies.csv')
+#df55 = pd.read_csv('country-capitals.csv')
+#df55['CountryName'] = df55['CountryName'].replace('United States', 'USA')
+#df55['CountryName'] = df55['CountryName'].replace('United Kingdom', 'UK')
+#df55['CountryName'] = df55['CountryName'].replace('Hong Kong', 'China')
+#df55['CountryName'] = df55['CountryName'].replace('Santa Clara', 'USA')
 
+#df55= df55.sort_values('CountryName')
 
-df55['Country'] = df55['Country'].replace('United States', 'USA')
-df55['Country'] = df55['Country'].replace('United Kingdom', 'UK')
-df55['Country'] = df55['Country'].replace('Hong Kong', 'China')
-df55['Country'] = df55['Country'].replace('Santa Clara', 'USA')
-df55= df55.sort_values('Country')
-df55.to_csv('unicorn_ready_for_clustering_and_map.csv')
+#df55.to_csv(.csv')
