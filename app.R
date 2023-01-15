@@ -108,6 +108,7 @@ server <- function(input, output) {
       select(Industry, City) %>% 
       filter(Industry == industry_select())
     filtered_data <- unicorn_companies_clean %>% filter(Industry == industry_select())
+    selectedX <- industry_select()
     investors_data <- filtered_data %>%
       gather("Investor", "name", Investor.1:Investor.4) %>%
       filter(name != "") %>%
@@ -138,7 +139,7 @@ server <- function(input, output) {
                    color = investors_data$name,
                    colors = RColorBrewer::brewer.pal(n = nrow(investors_data),
                                                      name = 'Set1'))
-    fig <- fig %>% layout(title = "Top Investors for selected Industry")
+    fig <- fig %>% layout(title = paste("Top Investors for selected Industry",selectedX))
     fig
     
     
@@ -189,7 +190,7 @@ server <- function(input, output) {
     capital_coordinates_dataset <- capital_coordinates_dataset %>% 
         right_join(data_subset, by = c("CountryName" = "region"))
 
-    col_scale <- colorNumeric(palette = "red", domain = c(min(capital_coordinates_dataset$Valuation), max(capital_coordinates_dataset$Valuation)))
+    col_scale <- colorNumeric(palette = "blue", domain = c(min(capital_coordinates_dataset$Valuation), max(capital_coordinates_dataset$Valuation)))
     leaflet(capital_coordinates_dataset) %>% addTiles() %>% 
       addCircleMarkers(lat = as.numeric(capital_coordinates_dataset$CapitalLatitude), 
                        lng = as.numeric(capital_coordinates_dataset$CapitalLongitude), 
