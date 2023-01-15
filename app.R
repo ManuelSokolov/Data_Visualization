@@ -3,16 +3,6 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(tidyr)
-#install.packages("libzip")
-#install.packages("png")
-#install.packages("RgoogleMaps")
-#install.packages("ggmap")
-#install.packages("rnaturalearth")
-#install.packages('maps')
-#install.packages('heatmaply')
-#install.packages('factoextra')
-#install.packages('shinyHeatmaply')
-#install.packages('shinyHeatmaply', dependencies = TRUE)
 library(ggmap)
 library('rnaturalearth')
 library(maps)
@@ -76,7 +66,7 @@ ui <- navbarPage(
   tabPanel("Tab 2 - Valuation and Total Raised", value = "tab2",
            titlePanel("Is Valuation correlated with total raised?"),
            # not interactive
-           plotOutput("clustering_plot", click = "plot_click"),
+           plotlyOutput("clustering_plot"),
            sliderInput(inputId = "range_clusters",
                        label = "Number of clusters",
                        min = 2,
@@ -156,29 +146,42 @@ server <- function(input, output) {
     
   })
   
-  output$clustering_plot <- renderPlot({
+  output$clustering_plot <- renderPlotly({
     valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
-    valuation_total_raised <- valuation_total_raised %>% drop_na()
     
+    rownames(valuation_total_raised) <- unicorn_countries_clustering_cleaned$Company
+    valuation_total_raised <- valuation_total_raised %>% drop_na()
+   
     # Perform k-means clustering
-    kmeans_fancy <- kmeans(scale(valuation_total_raised), max(input$range_clusters) , nstart = 100)
+    kmeans_fancy <- kmeans(valuation_total_raised, max(input$range_clusters) , nstart = 100)
     
     # Add cluster column to the original dataframe
     unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
+
+    # Create the ggplot2 object
+    plot <- fviz_cluster(kmeans_fancy, data = scale(valuation_total_raised), 
+                         geom = c("point"),
+                         ellipse.type = "convex") + xlim(0,6) + ylim(0,7)
     
-    # plot the clusters
-    fviz_cluster(kmeans_fancy, data = scale(valuation_total_raised), geom = c("point"),ellipse.type = "euclid")
+    # Convert the ggplot2 object to an interactive plotly object
+    plotly_plot <- plotly_build(plot, unicorn_countries_clustering_cleaned$Company)
+    
+    
+    # Show the interactive plotly object
+    plotly_plot
   })
 
   output$map_plot <- renderLeaflet({
     industry_investors_data <- unicorn_countries_clustering_cleaned %>% 
       group_by(Country) %>% 
-      summarize(Valuation = mean(Valuation...B.))
+      summarize(Valuation = sum(Valuation...B.))
     world_map_data <- map_data("world")
     # Merge the map data with your data and fill in missing values
     world_map_valuation <- world_map_data %>% 
       right_join(industry_investors_data, by = c("region" = "Country")) %>%
       mutate(Valuation = coalesce(Valuation, 0.0))
+   # valuation_total_raised <- valuation_total_raised %>% filter(Valuation...B. > 0 & Total.Raised > 0)
+    
     #data_subset1 <- subset(world_map_valuation, Valuation > 0.00001)
     data_subset <- world_map_valuation[!duplicated(world_map_valuation[ , c("region")]), ]
     capital_coordinates_dataset <- read.csv('data/country-capitals_clean.csv')[, c("CountryName", "CapitalName","CapitalLatitude","CapitalLongitude")]
@@ -186,11 +189,13 @@ server <- function(input, output) {
     capital_coordinates_dataset <- capital_coordinates_dataset %>% 
         right_join(data_subset, by = c("CountryName" = "region"))
 
+    col_scale <- colorNumeric(palette = "red", domain = c(min(capital_coordinates_dataset$Valuation), max(capital_coordinates_dataset$Valuation)))
     leaflet(capital_coordinates_dataset) %>% addTiles() %>% 
-      addCircleMarkers(lat = as.numeric(capital_coordinates_dataset$CapitalLatitude), lng = as.numeric(capital_coordinates_dataset$CapitalLongitude), 
-                      popup = paste("Country:",capital_coordinates_dataset$CountryName, "<br>", "Valuation:",capital_coordinates_dataset$Valuation))
-
- 
+      addCircleMarkers(lat = as.numeric(capital_coordinates_dataset$CapitalLatitude), 
+                       lng = as.numeric(capital_coordinates_dataset$CapitalLongitude), 
+                       color = col_scale(capital_coordinates_dataset$Valuation),
+                       popup = paste("Country:",capital_coordinates_dataset$CountryName, "<br>", "Valuation (Billion $):",capital_coordinates_dataset$Valuation))
+    
   })
 
   
