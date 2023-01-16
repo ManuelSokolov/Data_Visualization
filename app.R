@@ -3,22 +3,9 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(tidyr)
-library(ggmap)
-library(maps)
-library(mapproj)
-library(factoextra)
-#update.packages()
 library(plotly)
-# Load Libraries
 library(tidyverse)
-library(readxl)
-library(FactoMineR)
-library(factoextra)
 library(leaflet)
-library(tidyverse)
-library(forcats)
-
-
 
 #world_map <- ne_countries(scale = "medium", returnclass = "sf")
 # original data set
