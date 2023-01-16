@@ -68,21 +68,26 @@ ui <- navbarPage(
   tabPanel("Tab 2 - Valuation and Total Raised", value = "tab2",
            titlePanel("Is Valuation correlated with total raised?"),
            # not interactive
-           plotlyOutput("clustering_plot"),
-           selectInput(inputId = "industry2", 
-                       label = h4(strong("Select a Industry Type:")), 
-                       choices = industry_choices2,
-                       selected = "All Industries"),
-           sliderInput(inputId = "range_clusters",
-                       label = "Number of clusters",
-                       min = 2,
-                       max = 6,
-                       value = 2
-                       
+           sidebarPanel(
+             selectInput(inputId = "industry2", 
+                         label = h4(strong("Select a Industry Type:")), 
+                         choices = industry_choices2,
+                         selected = "All Industries"),
+             selectInput(inputId = "showC", 
+                         label = h4(strong("Show the Companies:")), 
+                         choices = c("No","Yes"),
+                         selected = "All Industries"),
+             sliderInput(inputId = "range_clusters",
+                         label = "Number of clusters",
+                         min = 2,
+                         max = 6,
+                         value = 2)
+           ),
+            
            #interactive 
-           
+           mainPanel(plotlyOutput("clustering_plot"))
            #plotlyOutput("clustering_plot")
-           )),
+           ),
   
   tabPanel("Tab 3 - Map World Valuation", value = "tab3",titlePanel("Is there any geographical pattern regarding investment?"),
            leafletOutput("map_plot")
@@ -92,6 +97,7 @@ server <- function(input, output) {
   # Read in the unicorn companies dataset
   industry_select <- reactive({input$industry})
   industry_select2 <-  reactive({input$industry2})
+  showC <- reactive({input$showC})
   #print(industry_select)
   
   #spending_range <- reactive({
@@ -152,10 +158,7 @@ server <- function(input, output) {
   })
   
   output$clustering_plot <- renderPlotly({
-    if( industry_select2() != 'All Industries'){
-      print(industry_select())
-      unicorn_countries_clustering_cleaned <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select2())
-    }
+  
    # filtered_data <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select())
     valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
     
@@ -168,16 +171,24 @@ server <- function(input, output) {
     # Add cluster column to the original dataframe
     unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
     # Create the ggplot2 object
-    plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
-                         geom = c("point", "text"),
-                         ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
     
+    if (showC() == "Yes"){
+      plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
+                           geom = c("point", "text"),
+                           ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
+    }else {
+      plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
+                           geom = c("point"),
+                           ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
+    }
     # Convert the ggplot2 object to an interactive plotly object
     plotly_plot <- plotly_build(plot, unicorn_countries_clustering_cleaned$Company)
     
     
     # Show the interactive plotly object
     plotly_plot
+    
+   
   })
 
   output$map_plot <- renderLeaflet({
