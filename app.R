@@ -3,9 +3,20 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(tidyr)
+library(ggmap)
+library(maps)
+library(mapproj)
+library(factoextra)
+#update.packages()
 library(plotly)
+# Load Libraries
 library(tidyverse)
+library(readxl)
+library(FactoMineR)
+library(factoextra)
 library(leaflet)
+library(tidyverse)
+library(forcats)
 
 #world_map <- ne_countries(scale = "medium", returnclass = "sf")
 # original data set
@@ -14,7 +25,7 @@ unicorn_companies <- read.csv("data/Unicorn_Companies.csv")
 #dataset cleaned for first function - with investor 1, investor 2, investor 3
 unicorn_companies_clean <- read.csv("data/Unicorn_Clean.csv")
 
-#dataset with countries cleanes
+#dataset with countries cleaned
 unicorn_countries_clustering_cleaned <- read.csv('data/unicorn_ready_for_clustering_and_map.csv')
 
 industry_values <- unique(unicorn_companies_clean$Industry)
