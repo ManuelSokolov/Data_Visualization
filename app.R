@@ -202,7 +202,7 @@ server <- function(input, output) {
     capital_coordinates_dataset <- capital_coordinates_dataset %>% 
         right_join(data_subset, by = c("CountryName" = "region"))
 
-    col_scale <- colorNumeric(palette = "red", domain = c(min(capital_coordinates_dataset$Valuation), max(capital_coordinates_dataset$Valuation)))
+    col_scale <- colorNumeric(palette = "blue", domain = c(min(capital_coordinates_dataset$Valuation), max(capital_coordinates_dataset$Valuation)))
     leaflet(capital_coordinates_dataset) %>% addTiles() %>% 
       addCircleMarkers(lat = as.numeric(capital_coordinates_dataset$CapitalLatitude), 
                        lng = as.numeric(capital_coordinates_dataset$CapitalLongitude), 
