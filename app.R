@@ -50,7 +50,7 @@ industry_investor_frequencies <- read.csv("data/industry_investor_frequencies.cs
 ui <- navbarPage(
   "My Shiny App",
   tabPanel("Tab 1 - Industry and Investors", value = "tab1",
-           titlePanel("Are companies in certain industries more likely to attract certain investors?"),
+           titlePanel("Which are the most likely investors for a new startup?"),
            fluidRow(
              selectInput(inputId = "industry", 
                          label = h4(strong("Select a Industry Type:")), 
@@ -86,11 +86,7 @@ ui <- navbarPage(
   
   tabPanel("Tab 3 - Map World Valuation", value = "tab3",titlePanel("Is there any geographical pattern regarding investment?"),
            leafletOutput("map_plot")
-  ),
-  
-  tabPanel("Tab 4", value = "tab4",
-           titlePanel("What makes a company more valuated?")
-)
+  )
 )
 server <- function(input, output) {
   # Read in the unicorn companies dataset
@@ -173,8 +169,8 @@ server <- function(input, output) {
     unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
     # Create the ggplot2 object
     plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
-                         geom = c("point"),
-                         ellipse.type = "convex") + xlim(0,10) + ylim(0,10)
+                         geom = c("point", "text"),
+                         ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
     
     # Convert the ggplot2 object to an interactive plotly object
     plotly_plot <- plotly_build(plot, unicorn_countries_clustering_cleaned$Company)
@@ -185,6 +181,7 @@ server <- function(input, output) {
   })
 
   output$map_plot <- renderLeaflet({
+    
     industry_investors_data <- unicorn_countries_clustering_cleaned %>% 
       group_by(Country) %>% 
       summarize(Valuation = sum(Valuation...B.))
