@@ -4,19 +4,11 @@ library(magrittr)
 library(dplyr)
 library(tidyr)
 library(ggmap)
-library('rnaturalearth')
 library(maps)
 library(mapproj)
 library(factoextra)
-library(shinyHeatmaply)
-library(heatmaply)
 #update.packages()
 library(plotly)
-# Install if needed by removing the #
-#install.packages("tidyverse")
-#install.packages("readxl")
-#install.packages("FactoMineR")
-#install.packages("factoextra")
 # Load Libraries
 library(tidyverse)
 library(readxl)
@@ -126,7 +118,9 @@ server <- function(input, output) {
   })
   
   output$clustering_plot <- renderPlotly({
-  
+    if(industry_select2() != "All Industries") {
+      unicorn_countries_clustering_cleaned <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select())
+    }
    # filtered_data <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select())
     valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
     
