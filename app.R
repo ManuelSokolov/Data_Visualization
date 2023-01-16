@@ -42,6 +42,8 @@ industry_values <- unique(unicorn_companies_clean$Industry)
 
 industry_choices <- unlist(industry_values)
 
+industry_choices2 <- c(industry_choices, "All Industries")
+
 # numero de investidores por industria
 industry_investor_frequencies <- read.csv("data/industry_investor_frequencies.csv")
 
@@ -67,11 +69,16 @@ ui <- navbarPage(
            titlePanel("Is Valuation correlated with total raised?"),
            # not interactive
            plotlyOutput("clustering_plot"),
+           selectInput(inputId = "industry2", 
+                       label = h4(strong("Select a Industry Type:")), 
+                       choices = industry_choices2,
+                       selected = "All Industries"),
            sliderInput(inputId = "range_clusters",
                        label = "Number of clusters",
                        min = 2,
-                       max = 10,
-                       value = 5
+                       max = 6,
+                       value = 2
+                       
            #interactive 
            
            #plotlyOutput("clustering_plot")
@@ -88,6 +95,7 @@ ui <- navbarPage(
 server <- function(input, output) {
   # Read in the unicorn companies dataset
   industry_select <- reactive({input$industry})
+  industry_select2 <-  reactive({input$industry2})
   #print(industry_select)
   
   #spending_range <- reactive({
@@ -104,10 +112,11 @@ server <- function(input, output) {
   #})
   
   output$industry_investors_plot <- renderPlotly({
-    industry_investors_data <- unicorn_companies_clean %>%
-      select(Industry, City) %>% 
-      filter(Industry == industry_select())
+    #industry_investors_data <- unicorn_companies_clean %>%
+     # select(Industry, City) %>% 
+    #  filter(Industry == industry_select())
     filtered_data <- unicorn_companies_clean %>% filter(Industry == industry_select())
+    selectedX <- industry_select()
     investors_data <- filtered_data %>%
       gather("Investor", "name", Investor.1:Investor.4) %>%
       filter(name != "") %>%
@@ -138,7 +147,7 @@ server <- function(input, output) {
                    color = investors_data$name,
                    colors = RColorBrewer::brewer.pal(n = nrow(investors_data),
                                                      name = 'Set1'))
-    fig <- fig %>% layout(title = "Top Investors for selected Industry")
+    fig <- fig %>% layout(title = paste("Top Investors for",selectedX))
     fig
     
     
@@ -147,21 +156,25 @@ server <- function(input, output) {
   })
   
   output$clustering_plot <- renderPlotly({
+    if( industry_select2() != 'All Industries'){
+      print(industry_select())
+      unicorn_countries_clustering_cleaned <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select2())
+    }
+   # filtered_data <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select())
     valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
     
     rownames(valuation_total_raised) <- unicorn_countries_clustering_cleaned$Company
     valuation_total_raised <- valuation_total_raised %>% drop_na()
-   
+    
     # Perform k-means clustering
     kmeans_fancy <- kmeans(valuation_total_raised, max(input$range_clusters) , nstart = 100)
     
     # Add cluster column to the original dataframe
     unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
-
     # Create the ggplot2 object
-    plot <- fviz_cluster(kmeans_fancy, data = scale(valuation_total_raised), 
+    plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
                          geom = c("point"),
-                         ellipse.type = "convex") + xlim(0,6) + ylim(0,7)
+                         ellipse.type = "convex") + xlim(0,10) + ylim(0,10)
     
     # Convert the ggplot2 object to an interactive plotly object
     plotly_plot <- plotly_build(plot, unicorn_countries_clustering_cleaned$Company)
