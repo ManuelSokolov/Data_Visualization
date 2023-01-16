@@ -119,36 +119,66 @@ server <- function(input, output) {
   
   output$clustering_plot <- renderPlotly({
     if(industry_select2() != "All Industries") {
-      unicorn_countries_clustering_cleaned <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select())
+      unicorn_countries_clustering_cleaned <- read.csv('data/unicorn_ready_for_clustering_and_map.csv')
+      unicorn_countries_clustering_cleaned <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select2())
+      valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
+      
+      rownames(valuation_total_raised) <- unicorn_countries_clustering_cleaned$Company
+      valuation_total_raised <- valuation_total_raised %>% drop_na()
+      
+      # Perform k-means clustering
+      kmeans_fancy <- kmeans(valuation_total_raised, max(input$range_clusters) , nstart = 100)
+      
+      # Add cluster column to the original dataframe
+      unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
+      # Create the ggplot2 object
+      
+      if (showC() == "Yes"){
+        plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
+                             geom = c("point", "text"),
+                             ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
+      }else {
+        plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
+                             geom = c("point"),
+                             ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
+      }
+      # Convert the ggplot2 object to an interactive plotly object
+      plotly_plot <- plotly_build(plot, unicorn_countries_clustering_cleaned$Company)
+      
+      
+      # Show the interactive plotly object
+      plotly_plot
+    }else{
+      unicorn_countries_clustering_cleaned <- read.csv('data/unicorn_ready_for_clustering_and_map.csv')
+      valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
+      
+      rownames(valuation_total_raised) <- unicorn_countries_clustering_cleaned$Company
+      valuation_total_raised <- valuation_total_raised %>% drop_na()
+      
+      # Perform k-means clustering
+      kmeans_fancy <- kmeans(valuation_total_raised, max(input$range_clusters) , nstart = 100)
+      
+      # Add cluster column to the original dataframe
+      unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
+      # Create the ggplot2 object
+      
+      if (showC() == "Yes"){
+        plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
+                             geom = c("point", "text"),
+                             ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
+      }else {
+        plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
+                             geom = c("point"),
+                             ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
+      }
+      # Convert the ggplot2 object to an interactive plotly object
+      plotly_plot <- plotly_build(plot, unicorn_countries_clustering_cleaned$Company)
+      
+      
+      # Show the interactive plotly object
+      plotly_plot
     }
-   # filtered_data <- unicorn_countries_clustering_cleaned %>% filter(Industry == industry_select())
-    valuation_total_raised <- unicorn_countries_clustering_cleaned[, c("Valuation...B.", "Total.Raised")]
     
-    rownames(valuation_total_raised) <- unicorn_countries_clustering_cleaned$Company
-    valuation_total_raised <- valuation_total_raised %>% drop_na()
-    
-    # Perform k-means clustering
-    kmeans_fancy <- kmeans(valuation_total_raised, max(input$range_clusters) , nstart = 100)
-    
-    # Add cluster column to the original dataframe
-    unicorn_countries_clustering_cleaned$cluster <- kmeans_fancy$cluster
-    # Create the ggplot2 object
-    
-    if (showC() == "Yes"){
-      plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
-                           geom = c("point", "text"),
-                           ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
-    }else {
-      plot <- fviz_cluster(kmeans_fancy, data = valuation_total_raised, 
-                           geom = c("point"),
-                           ellipse.type = "convex") + xlim(0,20) + ylim(0,20)
-    }
-    # Convert the ggplot2 object to an interactive plotly object
-    plotly_plot <- plotly_build(plot, unicorn_countries_clustering_cleaned$Company)
-    
-    
-    # Show the interactive plotly object
-    plotly_plot
     
    
   })
