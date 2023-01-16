@@ -51,7 +51,7 @@ ui <- navbarPage(
   "My Shiny App",
   tabPanel("Tab 1 - Industry and Investors", value = "tab1",
            titlePanel("Which are the most likely investors for a new startup?"),
-           fluidRow(
+           sidebarPanel(
              selectInput(inputId = "industry", 
                          label = h4(strong("Select a Industry Type:")), 
                          choices = industry_choices,
@@ -61,8 +61,9 @@ ui <- navbarPage(
                          min = 1,
                          max = 20,
                          value = 10
-           ),
-           mainPanel(plotlyOutput("industry_investors_plot")))),
+           )),
+          
+           mainPanel(plotlyOutput("industry_investors_plot"))),
   
   
   tabPanel("Tab 2 - Valuation and Total Raised", value = "tab2",
@@ -98,25 +99,8 @@ server <- function(input, output) {
   industry_select <- reactive({input$industry})
   industry_select2 <-  reactive({input$industry2})
   showC <- reactive({input$showC})
-  #print(industry_select)
-  
-  #spending_range <- reactive({
-   # Out <- filter(spending, Age >= input$sliderAge[1], Age <= input$sliderAge[2])
- # })
-  
-  #spending_habits <- reactive({
-  #  Out <- filter(spending_range(), Habits %in% input$checkSpending)
- # })
-  
-  #spending_final <- reactive({
-  #  if (!input$mean || (input$mean %% 2) == 0) return(spending_habits())
-  #  meanscore(spending_habits(), responses)
-  #})
-  
+
   output$industry_investors_plot <- renderPlotly({
-    #industry_investors_data <- unicorn_companies_clean %>%
-     # select(Industry, City) %>% 
-    #  filter(Industry == industry_select())
     filtered_data <- unicorn_companies_clean %>% filter(Industry == industry_select())
     selectedX <- industry_select()
     investors_data <- filtered_data %>%
@@ -126,23 +110,7 @@ server <- function(input, output) {
       summarise(n=n()) %>%
       arrange(desc(n)) %>%
       slice_head(n = max(input$range))
-    #ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name)) +
-    #  geom_bar(stat = "identity") +
-    #  ggtitle("Top Investors for selected Industry") +
-    #  xlab("Investor") +
-    #  ylab("Frequency") +
-    #  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    #})
-    #ggplotly(ggplot(data = investors_data, aes(x= reorder(name, n), y=n, fill = name)) +
-    #          geom_bar(stat = "identity", aes(text = name), show.legend = F) +
-    #           ggtitle("Top Investors for selected Industry") +
-    #           xlab("Investor") +
-    #           ylab("Frequency") +
-    #           theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    
-    #)
-    
-    
+
     investors_data$name <- factor(investors_data$name, levels = investors_data$name[order(investors_data$n)])
     fig <- plot_ly(investors_data, x = reorder(investors_data$name, -investors_data$n), 
                    y = investors_data$n, type = 'bar', 
