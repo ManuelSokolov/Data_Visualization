@@ -67,7 +67,7 @@ ui <- navbarPage(
                          choices = industry_choices2,
                          selected = "All Industries"),
              selectInput(inputId = "showC", 
-                         label = h4(strong("Show the Companies:")), 
+                         label = h4(strong("Show Unicorn name:")), 
                          choices = c("No","Yes"),
                          selected = "All Industries"),
              sliderInput(inputId = "range_clusters",
