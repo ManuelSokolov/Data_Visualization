@@ -139,7 +139,7 @@ server <- function(input, output) {
                    color = investors_data$name,
                    colors = RColorBrewer::brewer.pal(n = nrow(investors_data),
                                                      name = 'Set1'))
-    fig <- fig %>% layout(title = paste("Top Investors for selected Industry",selectedX))
+    fig <- fig %>% layout(title = paste("Top Investors for",selectedX))
     fig
     
     
