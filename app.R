@@ -16,7 +16,6 @@ library(leaflet)
 library(tidyverse)
 library(forcats)
 
-#world_map <- ne_countries(scale = "medium", returnclass = "sf")
 # original data set
 unicorn_companies <- read.csv("data/Unicorn_Companies.csv")
 
@@ -32,7 +31,6 @@ industry_choices <- unlist(industry_values)
 
 industry_choices2 <- c(industry_choices, "All Industries")
 
-# numero de investidores por industria
 industry_investor_frequencies <- read.csv("data/industry_investor_frequencies.csv")
 
 ui <- navbarPage(
